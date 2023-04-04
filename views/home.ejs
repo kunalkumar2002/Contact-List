@@ -1,0 +1,47 @@
+<html>
+    <head><!-- in place of this we can also use "Locals"
+            <%=title%>  like-->
+        <title>
+            
+            <%= locals.title %>
+        </title>
+        <script src="https://kit.fontawesome.com/4173e81178.js" crossorigin="anonymous"></script>
+        <!-- our css style present below every other style so we can override it -->
+        <link rel="stylesheet" href="/CSS/style.css">
+    </head>
+    <body>
+        <h1 id="page-heading">
+            <i class="fas fa-address-book"></i>
+            My Contact List
+        </h1>
+        <div class="contact-container">
+           <ul>
+               <% for(let i of contect_list){ %>
+               <li class="list-item">
+                   <!-- Adding contact -->
+                   <div class="details">
+                        <p class="contacts"  ><%= i.name %></p>
+                        <p class="contacts" ><%= i.phone %></p>
+                   </div>
+                   <!-- delating contact -->
+                   <div class="delete-button">
+                    <a href="/delete-contact/?phone=<%= i.phone %>">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                   </div>
+                </li>
+                <% } %>
+        
+            </ul>
+       </div>
+       <div class="form">
+        <form id="add-contact" action="create-contect" method="post">
+            <input id="taking-name" type="text" name="name" placeholder="enter your name" required>
+            <input id="taking-phone"type="number" name="phone" placeholder="enter phone number" required>
+            <button type="submit">add</button>
+        </form>
+       </div>
+       <script type="text/javascript" src="/js/script.js"></script>
+    </body>
+
+</html>
