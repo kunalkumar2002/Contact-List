@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const port = 8080;
 
+const db = require('./config/mongoose');
+//importing contact schima
+const Contact = require('./models/contact');
 const app = express();
 
 var contectList = [
@@ -51,10 +54,21 @@ app.use(express.static('Assets'));
 app.get('/',function(request,response){
     // //accessing req of mw1 in controler <-----------
     //  console.log(request.myName);
-     return response.render('home',{
-        title:'contect list',
-        contect_list:contectList
-     });
+
+    Contact.find({}).exec()
+    .then(results => {
+      // do something with the results...
+        return response.render('home',{
+            title:'contect list',
+            contect_list:results
+        });
+    })
+    .catch(error => {
+      // handle any errors...
+      console.log(error,'got error');
+
+    });
+   
 });
 
 //rendring on profile
@@ -69,11 +83,23 @@ app.get('/profile',function(request ,response){
 //adding contact by geting url
 
 app.post('/create-contect',function(request,response){
-    contectList.push({
-        name : request.body.name,
-        phone : request.body.phone 
-    });
-    return response.redirect('/');
+    // contectList.push({
+    //     name : request.body.name,
+    //     phone : request.body.phone 
+    // });
+    // // contectList.push(request.body);
+    // return response.redirect('/');
+
+    const doc = {
+        name: request.body.name,
+        phone: request.body.phone 
+    };
+
+    Contact.create(doc)
+      .then(createdDoc => console.log(createdDoc))
+      .catch(error => console.error(error));
+
+      return response.redirect('back');
    
 });
 
@@ -82,14 +108,30 @@ app.get('/delete-contact',function(req,res){
     // console.log(req.query);
 
     //geting query from url
-    let phone = req.query.phone;
+    // let phone = req.query.phone;
 
-    let contectIndex = contectList.findIndex(contact => contact.phone == phone);
+    //getin id from quering in url
+    let id = req.query.id;
 
-    if(contectIndex != -1){
-        contectList.splice(contectIndex,1);
-    }
-    return res.redirect('back');
+    // let contectIndex = contectList.findIndex(contact => contact.phone == phone);
+
+    // if(contectIndex != -1){
+    //     contectList.splice(contectIndex,1);
+    // }
+
+    //find the id into the databse which we have to delete
+
+    Contact.findByIdAndDelete(id)
+    .then((deletedDocument) => {
+      console.log(deletedDocument);
+    })
+    .catch((err) => {
+      console.error(err ," got error from deletion from database;");
+    });
+       
+        return res.redirect('back');
+    
+   
 })
 
 app.listen(port,function(err){
